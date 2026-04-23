@@ -1,3 +1,13 @@
 spring:
   application:
     name: cdn
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/cdn
+    username: admin
+    password: admin
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
