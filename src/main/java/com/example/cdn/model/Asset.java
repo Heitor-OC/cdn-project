@@ -37,4 +37,8 @@ public class Asset {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = Instant.now();
+    }
 }
