@@ -12,6 +12,8 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,37 +31,51 @@ public class AssetService {
 
     public String upload(MultipartFile file) {
 
-        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        if (file.isEmpty()) {
+            throw new RuntimeException("Arquivo vazio");
+        }
 
-        Path path = Paths.get(storagePath).resolve(filename);
+        try {
 
-        Files.createDirectories(path.getParent());
-        Files.write(path, file.getBytes());
+            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-        Asset asset = Asset.builder()
-                .filename(filename)
-                .storagePath(path.toString())
-                .contentType(file.getContentType())
-                .size(file.getSize())
-                .build();
+            Path path = Paths.get(storagePath).resolve(filename);
 
-        assetRepository.save(asset);
+            Files.createDirectories(path.getParent());
+            Files.write(path, file.getBytes());
 
-        log.info("O arquivo foi salvo com sucesso: ", filename);
-        return filename;
+            Asset asset = Asset.builder()
+                    .filename(filename)
+                    .storagePath(path.toString())
+                    .contentType(file.getContentType())
+                    .size(file.getSize())
+                    .build();
+
+            assetRepository.save(asset);
+
+            log.info("O arquivo foi salvo com sucesso: ", filename);
+            return filename;
+
+        } catch (IOException e) {
+            throw new RuntimeException("erro ao salvar", e);
+        }
     }
 
     public Resource download(String filename) {
-        Asset asset = assetRepository.findByFilename(filename);
+        Asset asset = assetRepository.findByFilename(filename).orElseThrow(() -> new RuntimeException("arquivo nao encontrado"));
 
-        Path path = Paths.get(asset.getStoragePath());
+        try {
+            Path path = Paths.get(asset.getStoragePath());
 
-        Resource resource = new UrlResource(path.toUri());
+            Resource resource = new UrlResource(path.toUri());
 
-        log.info("Arquivo carregado: ", filename);
+            log.info("Arquivo carregado: ", filename);
 
-        return resource;
+            return resource;
 
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Erro ao carregar o arquivo", e);
+        }
     }
 
 }
