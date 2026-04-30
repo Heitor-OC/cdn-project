@@ -1,5 +1,6 @@
 package com.example.cdn.controller;
 
+import com.example.cdn.dto.UploadResponseDTO;
 import com.example.cdn.service.AssetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -17,9 +18,11 @@ public class AssetController {
     private final AssetService assetService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) {
-        String filename = assetService.upload(file);
-        return ResponseEntity.ok("Arquivo enviado: " + filename);
+    public ResponseEntity<UploadResponseDTO> upload(@RequestParam("file") MultipartFile file) {
+
+        UploadResponseDTO response = assetService.upload(file);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{filename}")

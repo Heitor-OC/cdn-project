@@ -1,5 +1,7 @@
 package com.example.cdn.service;
 
+import com.example.cdn.dto.UploadResponseDTO;
+import com.example.cdn.mapper.UploadMapper;
 import com.example.cdn.model.Asset;
 import com.example.cdn.repository.AssetRepository;
 
@@ -25,11 +27,12 @@ import java.util.UUID;
 public class AssetService {
 
     private final AssetRepository assetRepository;
+    private final UploadMapper uploadMapper;
 
     @Value("${storage.path}")
     private String storagePath;
 
-    public String upload(MultipartFile file) {
+    public UploadResponseDTO upload(MultipartFile file) {
 
         if (file.isEmpty()) {
             throw new RuntimeException("Arquivo vazio");
@@ -44,17 +47,14 @@ public class AssetService {
             Files.createDirectories(path.getParent());
             Files.write(path, file.getBytes());
 
-            Asset asset = Asset.builder()
-                    .filename(filename)
-                    .storagePath(path.toString())
-                    .contentType(file.getContentType())
-                    .size(file.getSize())
-                    .build();
+            Asset asset = uploadMapper.toEntity(file, filename, path.toString());
 
-            assetRepository.save(asset);
+            Asset saved = assetRepository.save(asset);
+
 
             log.info("O arquivo foi salvo com sucesso: ", filename);
-            return filename;
+
+            return uploadMapper.toResponse(saved);
 
         } catch (IOException e) {
             throw new RuntimeException("erro ao salvar", e);

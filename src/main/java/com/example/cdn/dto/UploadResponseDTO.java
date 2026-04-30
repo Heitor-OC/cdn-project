@@ -12,11 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UploadResponseDTO {
 
-    private UUID id;
     private String filename;
-    private String storagePath;
     private String contentType;
     private Long size;
-    private String etag;
     private Instant createdAt;
 }
