@@ -61,21 +61,32 @@ public class AssetService {
         }
     }
 
-    public Resource download(String filename) {
-        Asset asset = assetRepository.findByFilename(filename).orElseThrow(() -> new RuntimeException("arquivo nao encontrado"));
+    public Asset getAsset(String filename) {
+        return assetRepository.findByFilename(filename).orElseThrow(() -> new RuntimeException("Arquivo não encontrado"));
+    }
+
+    public Resource loadResource(Asset asset) {
 
         try {
             Path path = Paths.get(asset.getStoragePath());
-
             Resource resource = new UrlResource(path.toUri());
 
-            log.info("Arquivo carregado: ", filename);
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("Arquivo nao encontrado ou ilegivel");
+            }
+
+            log.info("Arquivo carregado: {}", asset.getFilename());
 
             return resource;
 
         } catch (MalformedURLException e) {
             throw new RuntimeException("Erro ao carregar o arquivo", e);
         }
+    }
+
+    public Resource download(String filename) {
+        Asset asset = getAsset(filename);
+        return loadResource(asset);
     }
 
 }

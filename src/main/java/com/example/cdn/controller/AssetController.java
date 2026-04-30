@@ -1,6 +1,7 @@
 package com.example.cdn.controller;
 
 import com.example.cdn.dto.UploadResponseDTO;
+import com.example.cdn.model.Asset;
 import com.example.cdn.service.AssetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -27,10 +28,13 @@ public class AssetController {
 
     @GetMapping("/{filename}")
     public ResponseEntity<Resource> download(@PathVariable String filename) {
-        Resource file = assetService.download(filename);
+        Asset asset = assetService.getAsset(filename);
+        Resource file = assetService.loadResource(asset);
 
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(asset.getContentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + asset.getFilename() + "\"")
                 .body(file);
-    }
+        }
 }

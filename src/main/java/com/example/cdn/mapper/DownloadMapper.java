@@ -6,13 +6,12 @@ import com.example.cdn.model.Asset;
 public class DownloadMapper {
     public static DownloadResponseDTO toResponse(Asset asset){
         DownloadResponseDTO response = new DownloadResponseDTO();
-        response.setId(asset.getId());
+
         response.setFilename(asset.getFilename());
-        response.setStoragePath(asset.getStoragePath());
         response.setContentType(asset.getContentType());
         response.setSize(asset.getSize());
-        response.setEtag(asset.getEtag());
         response.setCreatedAt(asset.getCreatedAt());
+        response.setUrl("/cdn/" + asset.getFilename());
 
         return response;
     }
