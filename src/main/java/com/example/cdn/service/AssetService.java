@@ -69,6 +69,12 @@ public class AssetService {
 
         try {
             Path path = Paths.get(asset.getStoragePath());
+
+            /*
+            log.info("Caminho absoluto: {}", path.toAbsolutePath());
+            log.info("Arquivo existe? {}", Files.exists(path));
+             */
+
             Resource resource = new UrlResource(path.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {
