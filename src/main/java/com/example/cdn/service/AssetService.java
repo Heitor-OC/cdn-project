@@ -14,6 +14,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.cdn.exception.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -62,7 +63,11 @@ public class AssetService {
     }
 
     public Asset getAsset(String filename) {
-        return assetRepository.findByFilename(filename).orElseThrow(() -> new RuntimeException("Arquivo não encontrado"));
+        if (!assetRepository.existsByFilename(filename)) {
+            throw new FileNotFoundException("Arquivo nao encontrado: " + filename);
+        }
+
+        return assetRepository.findByFilename(filename);
     }
 
     public Resource loadResource(Asset asset) {

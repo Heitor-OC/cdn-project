@@ -7,6 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface AssetRepository extends JpaRepository<Asset, UUID> {
-    Optional<Asset> findByFilename(String filename);
+    Asset findByFilename(String filename);
     boolean existsByFilename(String filename);
 }
